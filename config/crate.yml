@@ -1,0 +1,59 @@
+################################### Cluster ###################################
+
+# cluster name
+cluster.name: baidu-es
+
+
+#################################### Node #####################################
+
+# node name
+# node.name: ${HOSTNAME}
+
+# Allow node to be master or datanode 
+node.master: true
+node.data: true
+
+
+############################## Network And HTTP ###############################
+
+# Set a custom port to listen for HTTP traffic:
+http.port: 8200
+
+# Set a custom port to listen for SQL traffic:
+mysql.port: 8306
+
+# Set a custom port for the node to node communication 
+transport.tcp.port: 9300
+
+
+#################################### Paths ####################################
+
+# Path to directory where to store table data allocated for this node.
+#path.data: /home/ssd/es-data
+
+
+################################### Gateway ###################################
+
+# Defines how many nodes should be waited for until the cluster state is
+# recovered immediately. The value should be equal to the number of nodes
+# in the cluster.
+#
+#gateway.expected_nodes: 3
+
+# Defines the number of nodes that need to be started before any cluster
+# state recovery will start.
+#
+#gateway.recover_after_nodes: 2
+
+
+################################## Discovery ##################################
+
+# More then half of the Master node, prevent Split Brain
+#discovery.zen.minimum_master_nodes: 2
+
+# config for default discovery hosts
+#discovery.zen.ping:
+#  multicast.enabled: false
+#  unicast.hosts:
+#    - localhost:4310
+#    - localhost:4300

@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+bin_dir=`dirname "$0"`
+bin_dir=`cd "$bin_dir"; pwd`
+if [ $ES_PID_DIR ];then
+    pid_file=$ES_PID_DIR/elasticsearch.pid
+else
+    pid_file=$bin_dir/elasticsearch.pid
+fi
+if [ -f $pid_file ]; then
+   pid=`cat $pid_file`
+   pid_command=`ps -p $pid -o command=`
+   if [[ $pid_command=~$bin_dir ]]; then
+      if kill -9 $pid > /dev/null 2>&1; then
+         echo "stop $pid_command, and remove pid file. "
+         rm $pid_file
+      else
+         echo "ERROR: kill process failed "
+         exit 0
+      fi
+   else
+      echo "ERROR: pid process may not be elasticsearch. "
+      exit 0
+   fi
+fi

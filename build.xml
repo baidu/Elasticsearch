@@ -1,0 +1,122 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2017, Baidu.com, Inc. All Rights Reserved
+
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+<project name="elasticsearch-baidu" default="output" basedir=".">
+    <!-- set global properties for this build -->
+    <property name="elasticsearch.artifact-name" value="elasticsearch-baidu"/>
+    <property name="elasticsearch.libdir"  value="${basedir}/deps/lib"/>
+    <property name="elasticsearch.builddir" value="${basedir}/build"/>
+    <property name="elasticsearch.outputdir" value="${basedir}/output"/>
+    <property name="elasticsearch.release-version" value="0.9.0"/>
+
+    <target name="clean">
+        <delete quiet="true" dir="${elasticsearch.builddir}"/>
+        <delete quiet="true" dir="${elasticsearch.outputdir}"/>
+    </target>
+
+    <target name="prepare" depends="clean">
+        <mkdir dir="${elasticsearch.builddir}"/>
+        <mkdir dir="${elasticsearch.builddir}/compile"/>
+        <mkdir dir="${elasticsearch.builddir}/compile/src"/>
+        <mkdir dir="${elasticsearch.builddir}/compile/test"/>
+        <mkdir dir="${elasticsearch.outputdir}"/>
+        <mkdir dir="${elasticsearch.outputdir}/bin"/>
+        <mkdir dir="${elasticsearch.outputdir}/lib"/>
+        <mkdir dir="${elasticsearch.outputdir}/config"/>
+    </target>
+
+    <!-- the normal classpath -->
+    <path id="classpathid">
+        <pathelement location="${elasticsearch.builddir}/compile/src"/>
+        <fileset dir="${elasticsearch.libdir}">
+            <include name="*.jar" />
+        </fileset>
+    </path>
+
+    <!-- the antlr classpath -->
+    <path id="antlr-classpath">
+        <pathelement location="${elasticsearch.builddir}/compile/src"/>
+        <fileset dir="${elasticsearch.libdir}/antlr">
+            <include name="*.jar" />
+        </fileset>
+    </path>
+
+    <target name="generate_git_info" depends="prepare" description="generate an info file which contains the git info">
+        <exec executable = "git" outputproperty="git.revision">
+            <arg line="rev-parse HEAD"/>
+        </exec>
+        <tstamp>
+            <format property="build_time" pattern="MM/dd/yyyy HH:mm:ss:sss zzz"/>
+        </tstamp>
+        <propertyfile file="src/main/resources/crate-build.properties" comment="Core code revision number">
+            <entry key="hash" value="${git.revision}" />
+            <entry key="timestamp" value="${build_time}" />
+            <entry key="baidu_version" value="${elasticsearch.release-version}" />
+        </propertyfile>
+    </target>
+    <!-- compile sql-parser file use antlr. -->
+    <target name="antlr-sql" depends="generate_git_info">
+        <java classname="org.antlr.Tool">
+            <classpath refid="antlr-classpath"/>
+            <arg value="-o"/>
+            <arg value="${basedir}/src/main/crate/java/io/crate/sql/parser"/>
+            <arg value="${basedir}/src/main/crate/java/io/crate/sql/parser/Statement.g"/>
+            <arg value="${basedir}/src/main/crate/java/io/crate/sql/parser/StatementBuilder.g"/>
+        </java>
+    </target>
+
+    <!-- compile handwirten java source files. -->
+    <target name="compile-src" depends="antlr-sql">
+        <javac destdir="${elasticsearch.builddir}/compile/src" source="1.7" includeantruntime="false" debug="true" failonerror="true" debuglevel="lines,vars,source" encoding="UTF-8">
+            <classpath refid="classpathid"/>
+	    <src path="src/main/baidu/java"/>
+	    <src path="src/main/crate/java"/>
+	    <src path="src/main/elasticsearch/java"/>
+            <!--add test path here-->
+        </javac>
+    </target>
+
+    <!-- create the jar file -->
+    <target name="jar" depends="compile-src">
+        <jar jarfile="${elasticsearch.builddir}/${elasticsearch.artifact-name}.jar">
+            <fileset dir="${elasticsearch.builddir}/compile/src">
+                <include name="**/*.class" />
+            </fileset>
+            <fileset dir="src/main/resources/">
+            </fileset>
+        </jar>
+    </target>
+
+    <!-- copy file to output -->
+    <target name="output" depends="jar">
+        <copy todir="${elasticsearch.outputdir}/lib">
+            <fileset dir="${elasticsearch.libdir}" includes="*.jar"/>
+            <fileset dir="${elasticsearch.builddir}" includes="*.jar"/>
+        </copy>
+        <copy todir="${elasticsearch.outputdir}/config">
+            <fileset dir="${basedir}/config" />
+        </copy>
+        <copy todir="${elasticsearch.outputdir}/bin">
+            <fileset dir="${basedir}/bin" />
+        </copy>
+        <delete quiet="true" dir="${elasticsearch.builddir}"/>
+    </target>
+</project>
