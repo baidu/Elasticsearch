@@ -12,6 +12,8 @@
 - 增强的Reindex能力
 - 其他易用性改进
 
+这些改进的详细介绍位于[Overview文档](./docs/overview.md)中。
+
 ## 编译
 
 ### 环境依赖
