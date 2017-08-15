@@ -55,7 +55,9 @@
 
 palo-rd@baidu.com
 
-需要加入Elasticsearch微信技术讨论群的，请加微信号：myh13161636186，然后备注一下：加入Elasticsearch技术讨论群
+需要加入Elasticsearch微信技术讨论群的, 请扫描图中的二维码加入。
+
+![](./docs/images/weixinqun.jpg)
 
 
 ## License
