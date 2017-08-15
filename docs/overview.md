@@ -1,4 +1,5 @@
 #百度改进的Elasticsearch
+
 ## 介绍
 [Elasticsearch](https://github.com/elastic/elasticsearch)是一个灵活、功能强大的开源、分布式的实时搜索和分析引擎，百度从2014年开始在内部使用Elasticsearch来解决日志分析，多维分析，文本检索等问题。 在使用的过程中遇到了一系列的问题，比如Elasticsearch的多副本一致性，脑裂问题，查询语言不易用等。针对这些问题百度做了一系列的优化和改进，改进主要基于社区版本的Elasticsearch 2.3.3 和 Crate 0.55.
 
