@@ -72,10 +72,10 @@ Elasticsearch的社区版本一直没有权限管理能力，而Elastic公司的
 ### 脑裂改进
 Elasticsearch的社区版本的多个MasterNode之间的数据同步和选主方式一直没有明确的说明，从代码看不是RAFT也不是Paxos，所以很难判断是否正确，目前社区的很多工作都是通过测试各种Case来完善，所以我们决定改进它。通过一系列调研，我们最终选择Distributed Log来做Master Node之间，MasterNode和DataNode之间的元数据同步。
 
-####选主方式
+#### 选主方式
 Distributed Log本身依赖了Zookeeper，所以我们的选主方式就直接依赖的Zookeeper，通过Zookeeper完成选主的工作。
 
-####日志同步方式
+#### 日志同步方式
 当有数据变更时Master节点把变更Diff本身序列化，写入到Distributed Log中，其他的MasterNode和DataNode从Distributed Log中不断的读取增量向本地的State中Apply。
 MasterNode会定期向所有的节点发送Ping消息用来检测节点的健康状况，节点给Master节点回复的时候会把本地的DLSN(Distributed Log中对每一个Log的编号)返回，Master节点根据返回的DLSN信息，取最小的值，然后把这个之前的Log全部Truncate。
 

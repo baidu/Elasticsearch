@@ -51,6 +51,12 @@
 		}
 - SQL 的使用请参考 [Crate的官方文档](https://crate.io/docs/reference/sql/ddl/basics.html)。
 
+## Contact us
+
+palo-rd@baidu.com
+
+需要加入Elasticsearch微信技术讨论群的，请加微信号：myh13161636186，然后备注一下：加入Elasticsearch技术讨论群
+
 
 ## License
 
